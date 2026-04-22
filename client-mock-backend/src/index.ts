@@ -6,6 +6,7 @@
  * Now includes an Express server for middleware demonstration.
  */
 
+import "dotenv/config";
 import { Signalstack } from "@signalstack/sdk";
 import express from "express";
 

@@ -29,8 +29,6 @@ const navItems = [
   { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { title: "Projects", href: "/dashboard/projects", icon: FolderKanban },
   { title: "Logs", href: "/dashboard/logs", icon: ScrollText },
-  { title: "AI Chat", href: "/dashboard/chat", icon: MessageSquare },
-  { title: "Reports", href: "/dashboard/reports", icon: BarChart3 },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

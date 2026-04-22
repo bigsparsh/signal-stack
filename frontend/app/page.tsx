@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import {
   Activity,
   ArrowRight,
@@ -9,7 +11,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+
+  if (session?.user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
       {/* Gradient background orbs */}

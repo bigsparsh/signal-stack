@@ -15,6 +15,7 @@
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "@signalstack/sdk": "link:../sdk",
+    "dotenv": "^17.4.2",
     "express": "^4.18.2"
   },
   "devDependencies": {
