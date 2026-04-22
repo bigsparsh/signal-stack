@@ -1,0 +1,43 @@
+{
+  "name": "@signalstack/sdk",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Signalstack TypeScript SDK for log ingestion with Express middleware support",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --watch --dts",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "logging",
+    "monitoring",
+    "signalstack",
+    "express",
+    "middleware",
+    "tracing"
+  ],
+  "author": "Signalstack Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "express": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}
