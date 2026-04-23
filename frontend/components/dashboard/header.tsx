@@ -12,8 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, HelpCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { HelpGuide } from "./help-guide";
 
 interface DashboardHeaderProps {
   user: {
@@ -28,7 +29,9 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/40 px-4">
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-      <div className="flex-1" />
+      <div className="flex-1 flex items-center gap-4">
+        <HelpGuide />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger className="relative flex h-8 w-8 items-center justify-center rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar className="h-8 w-8">

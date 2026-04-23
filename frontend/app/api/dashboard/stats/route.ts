@@ -34,16 +34,28 @@ export async function GET() {
     });
   }
 
-  // Aggregated counts
-  const [totalLogs, errorCount, warnCount] = await Promise.all([
-    prisma.log.count({ where: { projectId: { in: projectIds } } }),
-    prisma.log.count({
-      where: { projectId: { in: projectIds }, level: { in: ["error", "fatal"] } },
-    }),
-    prisma.log.count({
-      where: { projectId: { in: projectIds }, level: "warn" },
-    }),
-  ]);
+  // Aggregated counts via level breakdown (single query)
+  const allLogs = await prisma.log.groupBy({
+    by: ["level"],
+    where: { projectId: { in: projectIds } },
+    _count: { id: true },
+  });
+
+  const levelBreakdown: Record<string, number> = {};
+  let totalLogs = 0;
+  let errorCount = 0;
+  let warnCount = 0;
+
+  for (const row of allLogs) {
+    const count = row._count.id;
+    levelBreakdown[row.level] = count;
+    totalLogs += count;
+    if (["error", "fatal"].includes(row.level)) {
+      errorCount += count;
+    } else if (row.level === "warn") {
+      warnCount += count;
+    }
+  }
 
   // Recent logs across all projects
   const recentLogs = await prisma.log.findMany({
@@ -52,17 +64,6 @@ export async function GET() {
     take: 10,
     include: { project: { select: { name: true } } },
   });
-
-  // Level breakdown
-  const allLogs = await prisma.log.groupBy({
-    by: ["level"],
-    where: { projectId: { in: projectIds } },
-    _count: { id: true },
-  });
-  const levelBreakdown: Record<string, number> = {};
-  for (const row of allLogs) {
-    levelBreakdown[row.level] = row._count.id;
-  }
 
   // Source breakdown (top sources by error count)
   const sourceLogs = await prisma.log.groupBy({

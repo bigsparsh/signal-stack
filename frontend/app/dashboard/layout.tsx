@@ -18,9 +18,9 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <DashboardSidebar user={session.user} />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
         <DashboardHeader user={session.user} />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-hidden p-6 flex flex-col">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

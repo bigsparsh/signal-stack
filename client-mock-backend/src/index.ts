@@ -14,7 +14,7 @@ import express from "express";
 
 const API_KEY = process.env["SIGNALSTACK_API_KEY"] ?? "test-api-key";
 const ENDPOINT = process.env["SIGNALSTACK_ENDPOINT"] ?? "http://localhost:8000";
-const INTERVAL_MS = 3000; // Generate a log every 3 seconds
+const INTERVAL_MS = 5000; // Generate a log every 5 seconds
 const PORT = 4000;
 
 const logger = new Signalstack({
@@ -22,7 +22,7 @@ const logger = new Signalstack({
   endpoint: ENDPOINT,
   source: "mock-client-backend",
   batchSize: 1, // Immediate for demo
-  flushIntervalMs: 2000,
+  flushIntervalMs: 10000,
 });
 
 // ─── Express Server ─────────────────────────────────────────────────────────

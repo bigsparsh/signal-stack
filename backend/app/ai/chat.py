@@ -25,6 +25,48 @@ async def query_logs(query: str, project_id: str):
     Use the following pieces of retrieved logs to answer the user's question.
     If you don't know the answer, just say that you don't know, don't try to make up an answer.
     
+    CRITICAL: 
+    1. If the user asks for a graph, chart, or visualization, you MUST provide the data in a structured JSON format inside a code block with the language "json" and a special field "type": "chart".
+    
+    2. If the user asks for details about SPECIFIC log entries or requests, you MUST provide the data in a structured JSON format inside a code block with the language "json". 
+       - If there is only one log, return a single object with "type": "log".
+       - If there are MULTIPLE logs, return a JSON ARRAY of objects, each with "type": "log".
+    
+    Format for "chart":
+    ```json
+    {{
+      "type": "chart",
+      "chartType": "bar" | "line" | "pie",
+      "title": "Chart Title",
+      "data": [
+        {{ "name": "label1", "value": 10 }}
+      ],
+      "description": "A brief description"
+    }}
+    ```
+    
+    Format for "log" (single):
+    ```json
+    {{
+      "type": "log",
+      "level": "error" | "warn" | "info" | "debug" | "fatal",
+      "message": "The log message",
+      "timestamp": "ISO timestamp",
+      "source": "service name",
+      "metadata": {{ "key": "value" }}
+    }}
+    ```
+
+    Format for "log" (multiple):
+    ```json
+    [
+      {{ "type": "log", ... }},
+      {{ "type": "log", ... }}
+    ]
+    ```
+    
+    If you are NOT providing a chart or specific log cards, just provide a regular text answer.
+    
     Context:
     {context}
     

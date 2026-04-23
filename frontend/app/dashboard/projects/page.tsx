@@ -106,11 +106,9 @@ export default function ProjectsPage() {
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700">
-              <Plus className="mr-2 h-4 w-4" />
-              New Project
-            </Button>
+          <DialogTrigger render={<Button className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700" />}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Project
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -142,9 +140,7 @@ export default function ProjectsPage() {
               </div>
             </div>
             <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
+              <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
               <Button
                 onClick={handleCreate}
                 disabled={creating || !newName.trim()}

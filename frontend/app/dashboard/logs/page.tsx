@@ -155,7 +155,7 @@ export default function LogsPage() {
           </TabsList>
         </Tabs>
         <div className="flex items-center gap-2">
-          <Select value={selectedProject} onValueChange={(v) => { setSelectedProject(v); setPage(0); }}>
+          <Select value={selectedProject} onValueChange={(v) => { if (v) { setSelectedProject(v); setPage(0); } }}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All Projects" />
             </SelectTrigger>
