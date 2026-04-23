@@ -9,7 +9,9 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.models import Project, Log
-from app.api.schemas import IngestRequest, IngestResponse, LogResponse, ProjectStatsResponse
+from app.api.schemas import IngestRequest, IngestResponse, LogResponse, ProjectStatsResponse, ChatRequest, ChatResponse
+from app.ai.vector_store import add_logs_to_vector_store
+from app.ai.chat import query_logs
 
 router = APIRouter()
 
@@ -55,10 +57,41 @@ async def ingest_logs(
     db.add_all(log_records)
     db.commit()
 
+    # Add to vector store for AI features
+    logs_for_ai = [
+        {
+            "level": log.level,
+            "message": log.message,
+            "metadata": log.log_metadata,
+            "source": log.source,
+            "timestamp": log.timestamp
+        }
+        for log in log_records
+    ]
+    await add_logs_to_vector_store(logs_for_ai, project.id)
+
     return IngestResponse(ingested=len(log_records))
 
 
 # ─── Query Endpoints ─────────────────────────────────────────────────────────
+
+
+@router.post("/chat", response_model=ChatResponse, tags=["AI"])
+async def ai_chat(
+    body: ChatRequest,
+    x_api_key: str = Header(..., alias="X-API-Key"),
+    db: Session = Depends(get_db),
+):
+    """
+    Query logs using natural language.
+    """
+    project = _get_project_by_api_key(x_api_key, db)
+    
+    try:
+        response = await query_logs(body.message, project.id)
+        return ChatResponse(response=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/logs", response_model=list[LogResponse], tags=["Logs"])

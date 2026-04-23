@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { Send, Bot, User, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Send, Bot, User, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -19,6 +26,11 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+}
+
+interface Project {
+  id: string;
+  name: string;
 }
 
 const suggestedQueries = [
@@ -39,9 +51,24 @@ export default function ChatPage() {
     },
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    // Fetch projects to populate the selector
+    fetch("/api/projects")
+      .then((res) => res.json())
+      .then((data) => {
+        setProjects(data);
+        if (data.length > 0) {
+          setSelectedProjectId(data[0].id);
+        }
+      });
+  }, []);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -50,25 +77,66 @@ export default function ChatPage() {
       timestamp: new Date(),
     };
 
-    const assistantMsg: Message = {
-      id: (Date.now() + 1).toString(),
-      role: "assistant",
-      content:
-        "I'm analyzing your logs now... This is a mock response. In production, this would query your log data using LangChain and return contextual insights about your application's health, error patterns, and anomalies.",
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: input,
+          projectId: selectedProjectId,
+        }),
+      });
+
+      const data = await response.json();
+
+      const assistantMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: data.response || data.error || "Sorry, I couldn't process that request.",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, assistantMsg]);
+    } catch (error) {
+      const errorMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Failed to connect to the AI service. Please make sure the backend is running.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>
-        <p className="text-muted-foreground mt-1">
-          Query your logs using natural language.
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>
+          <p className="text-muted-foreground mt-1">
+            Query your logs using natural language.
+          </p>
+        </div>
+        <div className="w-[200px]">
+          <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+            <SelectTrigger className="bg-card/50 backdrop-blur-sm border-border/50">
+              <SelectValue placeholder="Select project" />
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Card className="flex flex-1 flex-col border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
@@ -106,6 +174,19 @@ export default function ChatPage() {
                 )}
               </div>
             ))}
+            {isLoading && (
+              <div className="flex gap-3">
+                <Avatar className="h-8 w-8 shrink-0">
+                  <AvatarFallback className="bg-gradient-to-br from-violet-500 to-cyan-500 text-white">
+                    <Bot className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="bg-muted max-w-[70%] rounded-2xl px-4 py-3 text-sm flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
+                  Analyzing logs...
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Suggested queries */}
