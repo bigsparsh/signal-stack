@@ -51,3 +51,15 @@ class ProjectStatsResponse(BaseModel):
     warnCount: int
     errorRate: float
     levelBreakdown: dict[str, int]
+
+
+class ChatRequest(BaseModel):
+    """Request schema for AI chat."""
+
+    message: str
+
+
+class ChatResponse(BaseModel):
+    """Response schema for AI chat."""
+
+    response: str
