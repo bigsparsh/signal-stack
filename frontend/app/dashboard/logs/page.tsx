@@ -6,6 +6,7 @@ import { Search, Download, Loader2, RefreshCw, ChevronLeft, ChevronRight } from 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -136,15 +137,15 @@ export default function LogsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="flex flex-1 min-h-0 flex-col space-y-6">
+      <div className="shrink-0">
         <h1 className="text-3xl font-bold tracking-tight">Logs</h1>
         <p className="text-muted-foreground mt-1">
           Real-time log stream across all connected services.
         </p>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={level} onValueChange={(v) => { setLevel(v); setPage(0); }}>
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
@@ -188,8 +189,9 @@ export default function LogsPage() {
         </div>
       </div>
 
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-0">
+      <Card className="flex-1 min-h-0 border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <ScrollArea className="h-full">
+          <CardContent className="p-0">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-6 w-6 animate-spin text-violet-400" />
@@ -275,7 +277,8 @@ export default function LogsPage() {
             </>
           )}
         </CardContent>
-      </Card>
-    </div>
-  );
+      </ScrollArea>
+    </Card>
+  </div>
+);
 }

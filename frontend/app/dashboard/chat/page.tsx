@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,10 +15,6 @@ import {
 } from "@/components/ui/select";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { ChatChart, ChartData } from "@/components/dashboard/chat-chart";
 import { RequestCard, LogData } from "@/components/dashboard/request-card";
@@ -49,7 +45,7 @@ function parseMessageContent(content: string): ParsedContent {
     const rawJson = match[1].trim();
     try {
       // Try parsing as-is
-      let parsed = JSON.parse(rawJson);
+      const parsed = JSON.parse(rawJson);
       
       // Handle array of objects
       if (Array.isArray(parsed)) {
@@ -98,10 +94,6 @@ const suggestedQueries = [
   "Which service has the highest error rate?",
   "Are there any anomalies in the current log patterns?",
 ];
-
-import { useRef } from "react";
-
-// ... (previous helper and types)
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -186,7 +178,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="flex flex-1 min-h-0 flex-col overflow-hidden">
       <Card className="flex min-h-0 flex-1 flex-col border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden shadow-2xl">
         {/* Sticky Header inside Card */}
         <div className="flex items-center justify-between p-4 border-b border-border/40 bg-card/80 backdrop-blur-md shrink-0 z-10">
@@ -212,7 +204,7 @@ export default function ChatPage() {
           </div>
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 min-h-0 h-full">
           <div className="p-6 space-y-6">
             {messages.map((msg) => {
               const { text, charts, logs } = parseMessageContent(msg.content);
